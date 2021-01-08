@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:background="?android:attr/selectableItemBackground"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/mag"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="20dp"
+        android:layout_marginRight="20dp"
+        android:background="@drawable/magnitude_circle"
+        android:gravity="center"
+        android:textColor="#ffffff"
+        android:textSize="16sp"
+        tools:text="5.7" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_weight="3"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/it_sec_loc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginLeft="5dp"
+            android:fontFamily="sans-serif-medium"
+            android:textAllCaps="true"
+            android:textColor="@color/textColorEarthquakeDetails"
+            android:textSize="12sp"
+            android:visibility="gone"
+            tools:text="42KM W of" />
+
+        <TextView
+            android:id="@+id/it_prim_loc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-medium"
+            android:maxLines="2"
+            android:textColor="@color/textColorEarthquakeLocation"
+            android:textSize="16sp"
+            tools:text="San Francisco" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="end"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/it_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-medium"
+            android:text="OCT 30, 2010"
+            android:textColor="@color/textColorEarthquakeDetails"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/it_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-medium"
+            android:textColor="@color/textColorEarthquakeDetails"
+            android:textSize="12sp"
+            tools:text="03:30 AM" />
+    </LinearLayout>
+
+
+</LinearLayout>
