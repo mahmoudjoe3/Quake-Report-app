@@ -13,20 +13,6 @@
         android:textColor="#ffffff"
         android:textSize="21sp" />
 
-    <EditText
-        android:id="@+id/startYear"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        android:hint="Start Year" />
-
-
-    <EditText
-        android:id="@+id/endYear"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        android:hint="End Year" />
 
     <EditText
         android:id="@+id/minMag"
@@ -35,6 +21,14 @@
         android:layout_marginStart="5dp"
         android:layout_marginLeft="5dp"
         android:hint="Min Mag " />
+
+    <EditText
+        android:id="@+id/rows"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginLeft="5dp"
+        android:hint="Number of Rows" />
 
     <LinearLayout
         android:layout_width="match_parent"
