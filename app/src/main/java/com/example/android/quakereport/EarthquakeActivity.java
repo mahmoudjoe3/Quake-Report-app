@@ -15,10 +15,24 @@
  */
 package com.example.android.quakereport;
 
+import android.app.Application;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.ProgressBar;
+import android.widget.Spinner;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -29,16 +43,18 @@ import androidx.loader.content.Loader;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
-import android.view.View;
-import android.widget.EditText;
-import android.widget.ProgressBar;
-import android.widget.Spinner;
-
 import com.example.android.quakereport.Model.item;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
 
 public class EarthquakeActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<item>> {
     private static final int EARTHQUAKE_LOADER_ID = 1;
@@ -47,34 +63,81 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderManag
     String orderBy = "time";
     String urlStr;
     item_adapter adapter;
-    ProgressBar progress;
-    FloatingActionButton actionButton;
     EarthQuakeLoader loader;
     public static final String TAG = "EarthquakeActivity.me";
+    @BindView(R.id.list)
+    RecyclerView earthquakeListView;
+    @BindView(R.id.empty_view)
+    TextView emptyView;
+    @BindView(R.id.progress)
+    ProgressBar progress;
 
+    private String getURL() {
+        return "https://earthquake.usgs.gov/fdsnws/event/1/" +
+                "query?format=geojson&" +
+                "minmagnitude=" + MinMag + "&" +
+                "limit=" + limit + "&"
+                + "orderby=" + orderBy;
+    }
+
+    private Boolean isNetworkAvailable(Application application) {
+        ConnectivityManager connectivityManager = (ConnectivityManager) application.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            Network nw = connectivityManager.getActiveNetwork();
+            if (nw == null) return false;
+            NetworkCapabilities actNw = connectivityManager.getNetworkCapabilities(nw);
+            return actNw != null &&
+                    (actNw.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
+                    || actNw.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR));
+        } else {
+            NetworkInfo nwInfo = connectivityManager.getActiveNetworkInfo();
+            return nwInfo != null && nwInfo.isConnected();
+        }
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.earthquake_activity);
+        ButterKnife.bind(this);
         Log.d(TAG, "LifeCycle onCreate: ");
-        progress = findViewById(R.id.progress);
-        RecyclerView earthquakeListView = findViewById(R.id.list);
-        actionButton = findViewById(R.id.filterBtn);
+        emptyView.setText(R.string.no_earthquakes_found);
+        Log.d(TAG, "onCreate: isnet-->"+isNetworkAvailable(this.getApplication()));
+        if(isNetworkAvailable(this.getApplication())) {
+            adapter = new item_adapter(EarthquakeActivity.this);
+            urlStr = getURL();
 
-        adapter = new item_adapter(EarthquakeActivity.this);
-        urlStr = getURL();
+            earthquakeListView.setAdapter(adapter);
+            earthquakeListView.setLayoutManager(new LinearLayoutManager(EarthquakeActivity.this));
 
-        earthquakeListView.setAdapter(adapter);
-        earthquakeListView.setLayoutManager(new LinearLayoutManager(EarthquakeActivity.this));
+            LoaderManager.getInstance(this).initLoader(EARTHQUAKE_LOADER_ID, null, this);
+        }
+        else {
+            progress.setVisibility(View.GONE);
+            emptyView.setVisibility(View.VISIBLE);
+            emptyView.setText(R.string.no_internet_connection);
+        }
 
-        LoaderManager.getInstance(this).initLoader(EARTHQUAKE_LOADER_ID, null, this);
+    }
 
-        actionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                createDialog().show();
-            }
-        });
+    private List<item> getEarthquakeListView() {
+        Log.d(TAG, "LifeCycle loadInBackground: ");
+        String JSONString = null;
+        try {
+            JSONString = HttpHandler.makeHttpRequest(create(urlStr));
+        } catch (IOException e) {
+            Log.e(TAG, "onCreate: makeHttpRequest error->", e);
+        }
+        return QueryUtils.extractEarthquakes(JSONString);
+    }
+
+    private URL create(String urlStr) {
+        URL url = null;
+        try {
+            url = new URL(urlStr);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        return url;
     }
 
 
@@ -90,6 +153,11 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderManag
     public void onLoadFinished(@NonNull Loader<List<item>> loader, List<item> data) {
         Log.d(TAG, "LifeCycle onLoadFinished: ");
         progress.setVisibility(View.GONE);
+        if(data==null||data.isEmpty())
+        {
+            emptyView.setVisibility(View.VISIBLE);
+        }else emptyView.setVisibility(View.GONE);
+
         adapter.setList(data);
         adapter.setOnClickListener(new item_adapter.OnClickListener() {
             @Override
@@ -106,18 +174,17 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderManag
         Log.d(TAG, "LifeCycle onLoaderReset: ");
     }
 
-    private String getURL() {
-        return "https://earthquake.usgs.gov/fdsnws/event/1/" +
-                "query?format=geojson&" +
-                "minmagnitude=" + MinMag + "&" +
-                "limit=" + limit + "&"
-                + "orderby=" + orderBy;
+
+
+    @OnClick(R.id.filterBtn)
+    public void onViewClicked() {
+        createDialog().show();
     }
 
     private AlertDialog createDialog() {
 
         final View view = getLayoutInflater().inflate(R.layout.filterdialog, null);
-        final EditText minMag,rows;
+        final EditText minMag, rows;
 
         minMag = view.findViewById(R.id.minMag);
         minMag.setText(MinMag + "");
@@ -142,6 +209,4 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderManag
                 }).setNegativeButton("Back", null).create();
 
     }
-
-
 }
