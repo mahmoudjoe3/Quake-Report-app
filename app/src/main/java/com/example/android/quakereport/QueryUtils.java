@@ -29,7 +29,7 @@ public final class QueryUtils {
      */
     public static ArrayList<item> extractEarthquakes(String JSON_RESPONSE) {
         ArrayList<item> earthquakes = new ArrayList<>();
-
+        Log.d(TAG, "LifeCycle extractEarthquakes: JSON");
         if(JSON_RESPONSE!=null) {
             try {
                 JSONObject root = new JSONObject(JSON_RESPONSE);

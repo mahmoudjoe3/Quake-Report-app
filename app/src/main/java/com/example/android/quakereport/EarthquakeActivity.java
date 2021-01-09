@@ -43,7 +43,7 @@ import java.util.List;
 public class EarthquakeActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<item>> {
     private static final int EARTHQUAKE_LOADER_ID = 1;
     int MinMag = 1;
-    int limit = 2000;
+    int limit = 20;
     String orderBy = "time";
     String urlStr;
     item_adapter adapter;
@@ -56,7 +56,7 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderManag
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.earthquake_activity);
-
+        Log.d(TAG, "LifeCycle onCreate: ");
         progress = findViewById(R.id.progress);
         RecyclerView earthquakeListView = findViewById(R.id.list);
         actionButton = findViewById(R.id.filterBtn);
@@ -81,14 +81,14 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderManag
     @NonNull
     @Override
     public Loader<List<item>> onCreateLoader(int id, @Nullable Bundle args) {
-        Log.d(TAG, "onCreateLoader: ");
+        Log.d(TAG, "LifeCycle onCreateLoader: ");
         loader = new EarthQuakeLoader(EarthquakeActivity.this, urlStr);
         return loader;
     }
 
     @Override
     public void onLoadFinished(@NonNull Loader<List<item>> loader, List<item> data) {
-        Log.d(TAG, "onLoadFinished: ");
+        Log.d(TAG, "LifeCycle onLoadFinished: ");
         progress.setVisibility(View.GONE);
         adapter.setList(data);
         adapter.setOnClickListener(new item_adapter.OnClickListener() {
@@ -103,7 +103,7 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderManag
 
     @Override
     public void onLoaderReset(@NonNull Loader<List<item>> loader) {
-        Log.d(TAG, "onLoaderReset: ");
+        Log.d(TAG, "LifeCycle onLoaderReset: ");
     }
 
     private String getURL() {
@@ -136,14 +136,12 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderManag
                         urlStr = getURL();
 
                         progress.setVisibility(View.VISIBLE);
-
-                        loader.setUrl(urlStr);
-                        loader.onStartLoading();
-
+                        LoaderManager.getInstance(EarthquakeActivity.this)
+                                .restartLoader(EARTHQUAKE_LOADER_ID, null, EarthquakeActivity.this);
                     }
                 }).setNegativeButton("Back", null).create();
 
     }
 
-    
+
 }

@@ -1,5 +1,7 @@
 package com.example.android.quakereport;
 
+import android.util.Log;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,10 +11,13 @@ import java.net.URL;
 
  class HttpHandler {
 
-    private HttpHandler() {
+     private static final String TAG = "HttpHandler";
+
+     private HttpHandler() {
     }
 
     public static String makeHttpRequest(URL url) throws IOException {
+        Log.d(TAG, "LifeCycle makeHttpRequest: ");
         String jsonResponse = "";
         HttpURLConnection urlConnection = null;
         InputStream inputStream = null;

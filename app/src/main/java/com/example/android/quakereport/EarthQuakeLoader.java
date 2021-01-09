@@ -30,7 +30,7 @@ public class EarthQuakeLoader extends AsyncTaskLoader<List<item>> {
     @Override
     protected void onStartLoading() {
         super.onStartLoading();
-        Log.d(TAG, "onStartLoading: ");
+        Log.d(TAG, "LifeCycle onStartLoading: ");
         forceLoad();
     }
 
@@ -38,7 +38,7 @@ public class EarthQuakeLoader extends AsyncTaskLoader<List<item>> {
     @Override
     public List<item> loadInBackground() {
 
-        Log.d(TAG, "loadInBackground: ");
+        Log.d(TAG, "LifeCycle loadInBackground: ");
         String JSONString = null;
         try {
             JSONString = HttpHandler.makeHttpRequest(create(url));
