@@ -119,27 +119,6 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderManag
 
     }
 
-    private List<item> getEarthquakeListView() {
-        Log.d(TAG, "LifeCycle loadInBackground: ");
-        String JSONString = null;
-        try {
-            JSONString = HttpHandler.makeHttpRequest(create(urlStr));
-        } catch (IOException e) {
-            Log.e(TAG, "onCreate: makeHttpRequest error->", e);
-        }
-        return QueryUtils.extractEarthquakes(JSONString);
-    }
-
-    private URL create(String urlStr) {
-        URL url = null;
-        try {
-            url = new URL(urlStr);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-        return url;
-    }
-
 
     @NonNull
     @Override
